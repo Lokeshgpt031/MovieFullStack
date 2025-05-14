@@ -1,14 +1,8 @@
+using System.Text;
+using System.Security.Cryptography;
+using System.Diagnostics; // Added for Stopwatch
 namespace MovieApi.Middleware
 {
-    using Microsoft.AspNetCore.Http;
-    using Microsoft.Extensions.Logging;
-    using Microsoft.AspNetCore.Hosting;
-    using System.IO;
-    using System.Text;
-    using System.Threading.Tasks;
-    using System.Security.Cryptography;
-    using System.Diagnostics; // Added for Stopwatch
-    using System; // Added for DateTimeOffset and TimeSpan
 
     public class CacheMiddleware
     {
@@ -44,7 +38,7 @@ namespace MovieApi.Middleware
             var cacheFilePath = Path.Combine(_cacheFolderPath, hashedCacheKey + ".cache");
             const int cacheExpiryMinutes = 1;
 
-            if (File.Exists(cacheFilePath))
+            if (File.Exists(cacheFilePath) && context.Request.Path.ToString().StartsWith("/api/Movies"))
             {
                 var lines = await File.ReadAllLinesAsync(cacheFilePath);
                 if (lines.Length > 0 && DateTimeOffset.TryParse(lines[0], out var timestamp))
@@ -87,7 +81,10 @@ namespace MovieApi.Middleware
 
                 var timestampLine = DateTimeOffset.UtcNow.ToString("o"); // ISO 8601 format
                 var contentToCache = $"{timestampLine}{Environment.NewLine}{responseBody}";
-                await File.WriteAllTextAsync(cacheFilePath, contentToCache);
+                if (context.Request.Path.ToString().StartsWith("/api/Movies"))
+                {
+                    await File.WriteAllTextAsync(cacheFilePath, contentToCache);
+                }
                 _logger.LogInformation($"Cache set for {rawCacheKey} (file: {cacheFilePath})");
 
                 await responseStream.CopyToAsync(originalBodyStream);

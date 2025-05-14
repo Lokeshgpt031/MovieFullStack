@@ -1,54 +1,52 @@
 using MovieApi.Middleware;
-using MovieApi.Models; // Added for MongoDbSettings
+using MovieApi.Models; // For MongoDbSettings
 using MovieApi.Service;
+// Ensure the "FileCache" folder is deleted on app initialization
+var cacheFolderPath = Path.Combine(Directory.GetCurrentDirectory(), "FileCache");
+if (Directory.Exists(cacheFolderPath))
+{
+    Directory.Delete(cacheFolderPath, true);
+}
+
+
+
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Configure services
 builder.Services.Configure<MongoDbSettings>(builder.Configuration.GetSection("MongoDbSettings"));
 builder.Services.AddSingleton<MongoDbService>();
-
-
-builder.Services.AddLogging(loggingBuilder =>
-{
-    loggingBuilder.AddConsole();
-    loggingBuilder.AddDebug();
-});
-
-
-// Register the MoviesService as a singleton
 builder.Services.AddSingleton<IMoviesService, MoviesService>();
+
+builder.Services.AddLogging(config =>
+{
+    config.AddConsole();
+    config.AddDebug();
+});
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddCors(options =>
+
+builder.Services.AddCors(config =>
 {
-    options.AddPolicy("AllowAll", builder =>
+    config.AddPolicy("AllowAll", policy =>
     {
-        builder.AllowAnyOrigin()
-               .AllowAnyMethod()
-               .AllowAnyHeader();
+        policy.WithOrigins("http://localhost:4200", "http://localhost:5075")
+              .AllowAnyMethod()
+              .AllowAnyHeader()
+              .AllowCredentials();
     });
 });
 
 var app = builder.Build();
 
-
-
-// Configure the HTTP request pipeline.
+// Configure middleware
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-app.UseMiddleware<CacheMiddleware>();
-app.MapGet("/", () => Results.Redirect("/swagger/index.html"));
-app.UseHttpsRedirection();
-
-app.UseAuthorization();
-
-app.MapControllers();
-
-app.Run();
+// Ensure CORS is applied early in the pipeline
+ap

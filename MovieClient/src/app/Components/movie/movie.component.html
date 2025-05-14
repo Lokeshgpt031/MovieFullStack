@@ -1,0 +1,17 @@
+<div class="container mx-auto p-4">
+<div class="card bg-base-100 shadow-sm">
+    <figure>
+        <img [src]="movie.poster || '/sample.jpg'" [alt]="movie.title" (error)="onImageError($event)" />   
+    </figure>
+    <div class="card-body">
+        <h2 class="card-title">{{ movie.title }}</h2>
+        <p>
+            <strong>{{ movie.plot }}</strong>
+            @for (cast of movie.cast; track $index) {
+                <div class="badge badge-neutral">{{ cast }}</div>
+            }
+        </p>
+        <div class="card-actions justify-end">
+            <button class="btn btn-primary">Buy Now</button>
+        </div>
+</div>

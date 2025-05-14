@@ -27,7 +27,7 @@ namespace MovieApi.Controllers
             return Ok(movies);
         }
         [HttpGet("page/{page}/size/{pageSize}")]
-        public async Task<ActionResult<List<Movies>>> GetAllMovies(int page, int pageSize)
+        public async Task<ActionResult<List<Movies>>> MoviesByPagination(int page, int pageSize)
         {
             if (page < 1 || pageSize < 1)
             {
@@ -147,6 +147,7 @@ namespace MovieApi.Controllers
             return Ok(movies);
         }
         [HttpGet("search")]
+        //uri=/api/movies/search?query=Inception
         public async Task<ActionResult<List<Movies>>> SearchMovies([FromQuery] string query)
         {
             var movies = await _moviesService.SearchMoviesAsync(query);
