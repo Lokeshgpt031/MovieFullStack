@@ -3,6 +3,10 @@ using Microsoft.AspNetCore.Mvc;
 using MovieApi.Middleware;
 using MovieApi.Models; // For MongoDbSettings
 using MovieApi.Service;
+using Azure.Identity;
+using Azure.Security.KeyVault.Secrets;
+using Azure.Extensions.AspNetCore.Configuration.Secrets;
+
 // Ensure the "FileCache" folder is deleted on app initialization
 var cacheFolderPath = Path.Combine(Directory.GetCurrentDirectory(), "FileCache");
 if (Directory.Exists(cacheFolderPath))
@@ -10,13 +14,28 @@ if (Directory.Exists(cacheFolderPath))
     Directory.Delete(cacheFolderPath, true);
 }
 
-
-
-
 var builder = WebApplication.CreateBuilder(args);
 
+
+
+// Configure Azure Key Vault
+string keyVaultUri = builder.Configuration["KeyVault:Uri"] ?? 
+    throw new InvalidOperationException("Key Vault URI is not configured.");
+var client = new SecretClient(new Uri(keyVaultUri), new DefaultAzureCredential());
+var secretName = "MongoDB--ConnectionString";
+var secretValue = client.GetSecret(secretName).Value.Value;
+Console.WriteLine($"Your secret is '{secretValue}'.");
+
+var DatabaseName = client.GetSecret("MongoDB--DatabaseName").Value.Value;
+Console.WriteLine($"Your secret is '{DatabaseName}'.");
+
 // Configure services
-builder.Services.Configure<MongoDbSettings>(builder.Configuration.GetSection("MongoDbSettings"));
+builder.Services.Configure<MongoDbSettings>(options =>
+{
+    options.ConnectionString = secretValue;
+    options.DatabaseName = DatabaseName;
+});
+
 builder.Services.AddSingleton<MongoDbService>();
 builder.Services.AddSingleton<IMoviesService, MoviesService>();
 
