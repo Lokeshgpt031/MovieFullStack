@@ -33,12 +33,12 @@ namespace MovieApi.Controllers
             {
                 _logger.LogWarning($"Invalid page or page size: page={page}, pageSize={pageSize}");
                 return BadRequest("Page and page size must be greater than 0.");
-            }   
+            }
             _logger.LogInformation($"Fetching movies for page {page} with page size {pageSize}");
             var movies = await _moviesService.GetAllMoviesAsync(page, pageSize);
             return Ok(movies);
         }
-        
+
         [HttpGet("{id}")]
         public async Task<ActionResult<Movies>> GetMovieById(ObjectId id)
         {
@@ -146,6 +146,26 @@ namespace MovieApi.Controllers
             }
             return Ok(movies);
         }
+        [HttpGet("searchByNameYear")]
+        // uri=/api/movies/search?name=Inception?year=2010
+        public async Task<ActionResult<Movies>> SearchMovies([FromQuery] string name, [FromQuery] int? year)
+        {
+            _logger.LogInformation($"Searching movies with name: {name} and year: {year}");
+            if (string.IsNullOrWhiteSpace(name) && !year.HasValue)
+            {
+                _logger.LogWarning("Both name and year are null or empty");
+                return BadRequest("At least one of name or year must be provided.");
+            }
+            var movies = await _moviesService.SearchMoviesAsync(name, year);
+            if (movies == null)
+            {
+                _logger.LogWarning($"No movies found for name: {name} and year: {year}");
+                return NotFound();
+            }
+            return Ok(movies);
+        }
+
+
         [HttpGet("search")]
         //uri=/api/movies/search?query=Inception
         public async Task<ActionResult<List<Movies>>> SearchMovies([FromQuery] string query)
@@ -157,5 +177,79 @@ namespace MovieApi.Controllers
             }
             return Ok(movies);
         }
+
+        [HttpGet("sort/rating/{sortOrder}")]
+        // uri=/api/movies/sort/rating/asc?page=1&pageSize=10
+        public async Task<ActionResult<List<Movies>>> GetMoviesSortedByRating(string sortOrder, [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+        {
+            _logger.LogInformation($"Fetching movies sorted by rating in {sortOrder} order");
+            if (string.IsNullOrWhiteSpace(sortOrder))
+            {
+                _logger.LogWarning("Sort order is null or empty");
+                return BadRequest("Sort order cannot be null or empty.");
+            }
+            if (sortOrder != "asc" && sortOrder != "desc")
+            {
+                _logger.LogWarning($"Invalid sort order: {sortOrder}");
+                return BadRequest("Sort order must be either 'asc' or 'desc'.");
+            }
+
+            var movies = await _moviesService.GetMoviesSortedByRatingAsync(sortOrder, page, pageSize);
+            if (movies == null || movies.Count == 0)
+            {
+                return NotFound();
+            }
+            return Ok(movies);
+        }
+
+        [HttpGet("sort/released/{sortOrder}")]
+        // uri=/api/movies/sort/released/asc?page=1&pageSize=10
+        public async Task<ActionResult<List<Movies>>> GetMoviesSortedByReleased(string sortOrder, [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+        {
+            _logger.LogInformation($"Fetching movies sorted by released date in {sortOrder} order");
+            if (string.IsNullOrWhiteSpace(sortOrder))
+            {
+                _logger.LogWarning("Sort order is null or empty");
+                return BadRequest("Sort order cannot be null or empty.");
+            }
+            if (sortOrder != "asc" && sortOrder != "desc")
+            {
+                _logger.LogWarning($"Invalid sort order: {sortOrder}");
+                return BadRequest("Sort order must be either 'asc' or 'desc'.");
+            }
+
+            var movies = await _moviesService.GetMoviesSortedByReleased(sortOrder, page, pageSize);
+            if (movies == null || movies.Count == 0)
+            {
+                return NotFound();
+            }
+            return Ok(movies);
+        }
+
+        [HttpGet("sort/title/{sortOrder}")]
+        // uri=/api/movies/sort/title/asc?page=1&pageSize=10
+        public async Task<ActionResult<List<Movies>>> GetMoviesSortedByTitle(string sortOrder, [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+        {
+            _logger.LogInformation($"Fetching movies sorted by title in {sortOrder} order");
+            if (string.IsNullOrWhiteSpace(sortOrder))
+            {
+                _logger.LogWarning("Sort order is null or empty");
+                return BadRequest("Sort order cannot be null or empty.");
+            }
+            if (sortOrder != "asc" && sortOrder != "desc")
+            {
+                _logger.LogWarning($"Invalid sort order: {sortOrder}");
+                return BadRequest("Sort order must be either 'asc' or 'desc'.");
+            }
+
+            var movies = await _moviesService.GetMoviesSortedByTitle(sortOrder, page, pageSize);
+            if (movies == null || movies.Count == 0)
+            {
+                return NotFound();
+            }
+            return Ok(movies);
+        }
+
+
     }
 }

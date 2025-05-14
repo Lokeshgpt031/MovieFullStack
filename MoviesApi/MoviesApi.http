@@ -5,3 +5,9 @@ Accept: application/json
 
 ###
 GET {{MoviesApi_HostAddress}}/api/Movies/
+
+###
+
+GET http://localhost:5075/api/Movies/sort/rating/asc?page=1&pageSize=6
+Accept: application/json
+

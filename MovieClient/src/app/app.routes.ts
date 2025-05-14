@@ -8,7 +8,7 @@ export const routes: Routes = [
     component: HomeComponent,
   },
   {
-    path: 'movie/:movieId/:timestamp',
+    path: 'movie/:title/:year',
     component: MovieComponent,
   },
   {

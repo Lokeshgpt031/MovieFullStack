@@ -50,7 +50,7 @@ namespace MovieApi.Middleware
                         var cachedResponse = string.Join(Environment.NewLine, lines, 1, lines.Length - 1);
                         await context.Response.WriteAsync(cachedResponse);
                         stopwatch.Stop(); // Stop timing
-                        _logger.LogInformation($"Request to {context.Request.Path} processed in {stopwatch.ElapsedMilliseconds}ms (from cache)");
+                        _logger.LogInformation($"Request to {context.Request.Path+context.Request.QueryString.ToString()} processed in {stopwatch.ElapsedMilliseconds}ms (from cache)");
                         return;
                     }
                     else

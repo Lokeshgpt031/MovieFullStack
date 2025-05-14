@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using MovieApi.Middleware;
 using MovieApi.Models; // For MongoDbSettings
 using MovieApi.Service;
@@ -18,11 +20,6 @@ builder.Services.Configure<MongoDbSettings>(builder.Configuration.GetSection("Mo
 builder.Services.AddSingleton<MongoDbService>();
 builder.Services.AddSingleton<IMoviesService, MoviesService>();
 
-builder.Services.AddLogging(config =>
-{
-    config.AddConsole();
-    config.AddDebug();
-});
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -54,13 +51,17 @@ app.UseCors("AllowAll");
 app.UseMiddleware<CacheMiddleware>();
 
 // Define endpoints
-app.MapGet("/health", () => Results.Ok("Healthy"));
-app.MapGet("/error", () => Results.Problem("An error occurred"));
 
 app.UseHttpsRedirection();
-app.UseRouting();
+// app.UseRouting();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.MapGet("/health", () => Results.Ok("Healthy"));
+app.MapGet("/error", () => Results.Problem("An error occurred"));
+
+
+app.MapGet("/", () => Results.Redirect("/swagger/index.html"));
 
 app.Run();

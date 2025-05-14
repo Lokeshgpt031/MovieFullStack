@@ -6,6 +6,7 @@ import { catchError, throwError } from 'rxjs';
 const API_URL = 'http://localhost:5075/';
 @Injectable({ providedIn: 'root' })
 export class MovieService {
+
   defaultImage = signal('');
   constructor(private httpClient: HttpClient) {}
 
@@ -51,5 +52,47 @@ export class MovieService {
   }
   getDefaultImage() {
     return this.defaultImage;
+  }
+
+  getMovieByTitle(sortOrder: 'asc' | 'desc', page: number, limit: number) {
+    return this.httpClient
+      .get<Movie[]>(API_URL + `api/Movies/sort/title/${sortOrder}?page=${page}&pageSize=${limit}`)
+      .pipe(
+        catchError((error) => {
+          console.error('Error fetching movies:', error);
+          return throwError(() => new Error('Failed to fetch movies'));
+        })
+      );
+  }
+  getMoviesByReleaseDate(sortOrder: 'asc' | 'desc', page: number, limit: number) {
+    return this.httpClient
+      .get<Movie[]>(API_URL + `api/Movies/sort/released/${sortOrder}?page=${page}&pageSize=${limit}`)
+      .pipe(
+        catchError((error) => {
+          console.error('Error fetching movies:', error);
+          return throwError(() => new Error('Failed to fetch movies'));
+        })
+      );
+  }
+  getMoviesByRating(sortOrder: 'asc' | 'desc', page: number, limit: number) {
+    return this.httpClient
+      .get<Movie[]>(API_URL + `api/Movies/sort/rating/${sortOrder}?page=${page}&pageSize=${limit}`)
+      .pipe(
+        catchError((error) => {
+          console.error('Error fetching movies:', error);
+          return throwError(() => new Error('Failed to fetch movies'));
+        })
+      );
+  }
+
+  getMovieByNameYear(name: string, year: number) {
+    return this.httpClient
+      .get<Movie>(API_URL + `api/Movies/searchByNameYear?name=${name}&year=${year}`)
+      .pipe(
+        catchError((error) => {
+          console.error('Error fetching movies:', error);
+          return throwError(() => new Error('Failed to fetch movies'));
+        })
+      );
   }
 }

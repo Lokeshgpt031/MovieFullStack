@@ -12,31 +12,54 @@
       [(ngModel)]="searchTerm"
       (keyup.enter)="searchMovies(searchTerm)"
     />
-    <button class="btn btn-primary ml-2"  (click)="searchMovies(searchTerm)">Search</button>
+    <button class="btn btn-primary ml-2" (click)="searchMovies(searchTerm)">
+      Search
+    </button>
   </div>
-</div>
+  <!-- sort movies based on rating, year, name and so on -->
+  <div class="flex justify-center mt-4">
+    <select
+      class="select select-bordered w-64 md:w-96"
+      [(ngModel)]="sortBy"
+      (change)="sortMovies(sortBy)"
+    >
+      @for (item of sortByOptions; track $index) {
+      <option [value]="item" [selected]="item === sortBy">
+        Sort by {{ item | titlecase }}
+      </option>
+      }
+    </select>
+    <button class="btn btn-primary ml-2" (click)="(sortOrder=='asc' ? sortOrder='desc' : sortOrder='asc') && sortMovies(sortBy)">
+      <!-- {{ sortOrder == 'asc' ? 'Ascending' : 'Descending' }} -->
+      Sort-{{ sortOrder | titlecase }}
+    </button>
+  </div>
 
-<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4 mt-8">
-  @for (movie of (searchResults.length ? searchResults : movies); track $index) {
+  <div
+    class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4 mt-8"
+  >
+    @for (movie of (searchResults.length ? searchResults : movies); track
+    $index) {
     <app-card [movie]="movie"></app-card>
-  }
-</div>
-
-<div class="flex justify-center mt-8">
-  <button class="btn btn-primary" (click)="loadMore()">Load More</button>
-</div>
-
-<div class="footer text-center bg-gray-100 p-4 mt-8">
-  <div class="text-center text-gray-600">
-    &copy; 2023 MoviesWiki. All rights reserved.
+    }
   </div>
-  <div class="flex justify-center mt-2">
-    <a href="#" class="text-gray-600 hover:text-gray-800 mx-2"
-      >Privacy Policy</a
-    >
-    <a href="#" class="text-gray-600 hover:text-gray-800 mx-2"
-      >Terms of Service</a
-    >
-    <a href="#" class="text-gray-600 hover:text-gray-800 mx-2">Contact Us</a>
+
+  <div class="flex justify-center mt-8">
+    <button class="btn btn-primary" (click)="loadMore()">Load More</button>
+  </div>
+
+  <div class="footer text-center bg-gray-100 p-4 mt-8">
+    <div class="text-center text-gray-600">
+      &copy; 2023 MoviesWiki. All rights reserved.
+    </div>
+    <div class="flex justify-center mt-2">
+      <a href="#" class="text-gray-600 hover:text-gray-800 mx-2"
+        >Privacy Policy</a
+      >
+      <a href="#" class="text-gray-600 hover:text-gray-800 mx-2"
+        >Terms of Service</a
+      >
+      <a href="#" class="text-gray-600 hover:text-gray-800 mx-2">Contact Us</a>
+    </div>
   </div>
 </div>

@@ -1,6 +1,6 @@
 @if (movie) {
-    
-<div class="card bg-base-100 w-96 shadow-sm" >
+
+<div class="card bg-base-100 w-96 shadow-sm" (click)="renderMoviesComponent(movie)" >
   <figure class="px-10 pt-10">
     <img class="rounded-xl" [src]="movie.poster || '/sample.jpg'" [alt]="movie.title" (error)="onImageError($event)"/>
   </figure>

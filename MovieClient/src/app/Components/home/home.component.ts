@@ -1,4 +1,4 @@
-import { Component, NgModule } from '@angular/core';
+import { Component, HostListener, NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Movie } from '../../Models/movies.model';
 import { MovieService } from '../../Services/movies.service';
@@ -14,6 +14,7 @@ import { CommonModule } from '@angular/common';
   providers: [MovieService, NgModule],
 })
 export class HomeComponent {
+
   page = 1;
   pageSize = 6;
   movies: Movie[] = [];
@@ -22,29 +23,60 @@ export class HomeComponent {
 
   defaultImage: string = '/sample.jpg';
   searchTerm: any;
+  sortBy: 'rating' | 'title' | 'releaseDate' = 'rating';
+  sortByOptions: string[] = ['rating', 'title', 'releaseDate'];
+  sortOrder: 'asc' | 'desc' = 'asc';
 
   constructor(moviesService: MovieService) {
     this.moviesService = moviesService;
-    this.getData();
+    this.sortMovies();
   }
 
-  getData() {
-    this.moviesService
-      .getMoviesByPagination(this.page, this.pageSize)
-      .subscribe(
+
+  sortMovies(arg0: "title" | "rating" | "releaseDate" = 'rating') {
+    this.movies = [];
+    this.sortBy = arg0;
+    this.getMoviesList();
+  }
+
+
+  getMoviesList() {
+    if (this.sortBy === 'rating') {
+      this.moviesService.getMoviesByRating(this.sortOrder,this.page,this.pageSize).subscribe(
         (data: Movie[]) => {
-          console.log('Movies fetched successfully:', data);
-          this.movies = [...this.movies, ...data];
+          this.movies = [...this.movies,...data];
+          console.log('Movies sorted by rating:', data);
         },
         (error: any) => {
-          console.error('Error fetching movies:', error);
+          console.error('Error sorting movies by rating:', error);
         }
       );
+    } else if (this.sortBy === 'title') {
+      this.moviesService.getMovieByTitle(this.sortOrder,this.page,this.pageSize).subscribe(
+        (data: Movie[]) => {
+          this.movies = [...this.movies, ...data];
+          console.log('Movies sorted by title:', data);
+        },
+        (error: any) => {
+          console.error('Error sorting movies by title:', error);
+        }
+      );
+    } else if (this.sortBy === 'releaseDate') {
+      this.moviesService.getMoviesByReleaseDate(this.sortOrder,this.page,this.pageSize).subscribe(
+        (data: Movie[]) => {
+          this.movies = [...this.movies,...data];
+          console.log('Movies sorted by release date:', data);
+        },
+        (error: any) => {
+          console.error('Error sorting movies by release date:', error);
+        }
+      );
+    }
   }
 
   loadMore() {
     this.page += 1;
-    this.getData();
+    this.sortMovies();
   }
   searchMovies(searchTerm: string): void {
     this.moviesService.getMoviesBySearch(searchTerm).subscribe(

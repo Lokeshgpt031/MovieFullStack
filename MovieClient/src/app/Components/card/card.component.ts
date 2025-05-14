@@ -14,13 +14,13 @@ import { Router, RouterLink } from '@angular/router';
 })
 export class CardComponent {
   @Input() movie!: Movie;
-  
+
   constructor(private router: Router) {}
-  
+
   ngOnInit() {
     console.log('Movie details:', this.movie);
   }
-  
+
   onImageError(event: Event) {
     const imgElement = event.target as HTMLImageElement;
     imgElement.src = '/sample.jpg';
@@ -30,6 +30,8 @@ export class CardComponent {
 
   renderMoviesComponent(movie: Movie) {
     console.log('Rendering movie component with movie:', movie);
-    this.router.navigate(['/movie', movie.id?.creationTime,movie.id?.timestamp]);
+    // Navigate to the movie details page with the movie title and year as parameters
+    
+    this.router.navigate(['/movie', movie.title, movie.year]);
   }
 }

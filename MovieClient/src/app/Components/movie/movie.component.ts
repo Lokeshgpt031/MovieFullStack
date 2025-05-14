@@ -1,37 +1,41 @@
 import { Component, Input, input } from '@angular/core';
 import { Movie } from '../../Models/movies.model';
 import { MovieService } from '../../Services/movies.service';
+import { ActivatedRoute } from '@angular/router';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-movie',
-  imports: [],
+  imports: [CommonModule],
   templateUrl: './movie.component.html',
   styleUrl: './movie.component.css',
 })
 export class MovieComponent {
-  timestamp:number=0;
-  creationTime:string='';
-  @Input() set queryParam(param: string) {
-    const parsedParam = JSON.parse(param);
-    console.log('Parsed param:', parsedParam);
-    
-    if (parsedParam && parsedParam.timestamp) {
-      this.timestamp = parsedParam.timestamp;
-    }
-    if (parsedParam && parsedParam.creationTime) {
-      this.creationTime = parsedParam.creationTime;
-    }
-    
-  }
+  @Input() title: string = '';
+  @Input() year: number = 0;
 
-  constructor(private movieService:MovieService) {
-    movieService.getMovieById({creationTime:this.creationTime, timestamp: this.timestamp}).subscribe((data: Movie) => {
-      this.movie = data;
+  @Input() defaultImage: string = '/sample.jpg';
+
+  constructor(
+    private movieService: MovieService,
+    private route: ActivatedRoute
+  ) {
+    this.route.params.subscribe((params: any) => {
+      this.title = params['title'];
+      this.year = params['year'];
+      console.log('Route parameters:', this.title, this.year);
     });
+
+    this.movieService.getMovieByNameYear(this.title, this.year).subscribe(
+      (data: Movie) => {
+        this.movie = data;
+        console.log('Movie details:', data);
+      },
+      (error: any) => {
+        console.error('Error fetching movie details:', error);
+      }
+    );
   }
-
-
-
 
   onImageError(event: Event) {
     const imgElement = event.target as HTMLImageElement;
@@ -39,5 +43,5 @@ export class MovieComponent {
     // Prevent infinite error loop if sample.jpg also fails to load
     imgElement.onerror = null;
   }
-   movie!: Movie;
+  movie!: Movie;
 }

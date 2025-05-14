@@ -1,7 +1,9 @@
 <div class="container mx-auto p-4">
+  <!-- Title -->
+  <h1 class="text-1xl font-bold text-center mb-4">{{ movie.title }}</h1>
 <div class="card bg-base-100 shadow-sm">
     <figure>
-        <img [src]="movie.poster || '/sample.jpg'" [alt]="movie.title" (error)="onImageError($event)" />   
+        <img [src]="movie.poster || '/sample.jpg'" [alt]="movie.title" (error)="onImageError($event)" />
     </figure>
     <div class="card-body">
         <h2 class="card-title">{{ movie.title }}</h2>
@@ -11,7 +13,44 @@
                 <div class="badge badge-neutral">{{ cast }}</div>
             }
         </p>
-        <div class="card-actions justify-end">
-            <button class="btn btn-primary">Buy Now</button>
-        </div>
+        <p>
+            <strong>Rating:</strong> {{ movie.imdb?.rating }} / 10
+        </p>
+        <p>
+            <strong>Year:</strong> {{ movie.year }}
+        </p>
+        <p>
+            <strong>Genre:</strong>
+            @for (genre of movie.genres; track $index) {
+                <div class="badge badge-neutral">{{ genre }}</div>
+            }
+            </p>
+        <p>
+            <strong>Director:</strong>
+            @for (director of movie.directors; track $index) {
+                <div class="badge badge-neutral">{{ director }}</div>
+            }
+        </p>
+        <p>
+            <strong>Runtime:</strong> {{ movie.runtime }} minutes
+        </p>
+        <p>
+            <strong>Language:</strong>
+            @for (language of movie.languages; track $index) {
+                <div class="badge badge-neutral">{{ language }}</div>
+            }
+        </p>
+        <p>
+            <strong>Country:</strong>
+            @for (country of movie.countries; track $index) {
+                <div class="badge badge-neutral">{{ country }}</div>
+            }
+        </p>
+        <p>
+            <strong>Box Office:</strong> {{ movie }}
+        </p>
+        <p>
+            <strong>Release Date:</strong> {{ movie.released |  date:'long' }}
+        </p>
+
 </div>
