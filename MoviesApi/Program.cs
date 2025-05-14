@@ -49,4 +49,18 @@ if (app.Environment.IsDevelopment())
 }
 
 // Ensure CORS is applied early in the pipeline
-ap
+app.UseCors("AllowAll");
+
+app.UseMiddleware<CacheMiddleware>();
+
+// Define endpoints
+app.MapGet("/health", () => Results.Ok("Healthy"));
+app.MapGet("/error", () => Results.Problem("An error occurred"));
+
+app.UseHttpsRedirection();
+app.UseRouting();
+app.UseAuthorization();
+
+app.MapControllers();
+
+app.Run();
